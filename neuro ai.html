@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Neuro AI - Gemini 2.5 Powered</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+
+        * {
+            font-family: "Inter", sans-serif;
+        }
+
+        /* Custom Tailwind Config */
+        @layer utilities {
+            .animate-float {
+                animation: float 6s ease-in-out infinite;
+            }
+            .animate-glow {
+                animation: glow 2s ease-in-out infinite;
+            }
+            .animate-gradient {
+                animation: gradient 8s ease infinite;
+                background-size: 200% 200%;
+            }
+            .animate-slide-up {
+                animation: slideUp 0.5s ease-out;
+            }
+            .animate-pulse-slow {
+                animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            33% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+            66% {
+                transform: translateY(-10px) rotate(-5deg);
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(11, 110, 253, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(11, 110, 253, 0.8), 0 0 60px rgba(11, 110, 253, 0.4);
+            }
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Particle Animation */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        @keyframes particleFloat {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.3;
+            }
+            25% {
+                transform: translate(50px, -100px) scale(1.2);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translate(100px, -50px) scale(0.8);
+                opacity: 0.4;
+            }
+            75% {
+                transform: translate(-50px, -150px) scale(1.1);
+                opacity: 0.5;
+            }
+        }
+
+        /* Glassmorphism Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark .glass {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #0b6efd;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3d8bff;
+        }
+
+        /* Thinking Animation */
+        @keyframes thinking {
+            0%, 100% {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+        .thinking-dot {
+            animation: thinking 1.4s ease-in-out infinite;
+        }
+
+        .thinking-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .thinking-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        /* Message Animations */
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .message-enter {
+            animation: messageSlide 0.4s ease-out;
+        }
+
+        /* Neon Glow Effect */
+        .neon-blue {
+            text-shadow: 0 0 10px rgba(11, 110, 253, 0.8),
+                        0 0 20px rgba(11, 110, 253, 0.6),
+                        0 0 30px rgba(11, 110, 253, 0.4);
+        }
+
+        /* Smooth Theme Transition */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* Input container updates for file attachment */
+        .input-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* File name display */
+        #fileNameDisplay {
+            font-size: 0.875rem;
+            color: #4b5563; /* gray-600 */
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* File input button styling */
+        #fileInputLabel {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            background: #0b6efd;
+            color: white;
+            border-radius: 9999px;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgb(11 110 253 / 0.7),
+                        0 2px 4px -2px rgb(11 110 253 / 0.5);
+            transition: background-color 0.3s ease;
+        }
+
+        #fileInputLabel:hover {
+            background-color: #3d8bff;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+    </style>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'ocean-blue': '#0B6EFD',
+                        'ocean-deep': '#0A58CA',
+                        'ocean-light': '#3D8BFF',
+                        'ocean-sky': '#6EA8FE',
+                        'dark-bg': '#0D1117',
+                        'dark-card': '#161B22',
+                        'dark-border': '#30363D',
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 dark:from-dark-bg dark:to-gray-900 text-gray-900 dark:text-gray-100 transition-all duration-300">
+
+    <!-- Animated Particle Background -->
+    <div id="particles" class="fixed inset-0 overflow-hidden pointer-events-none z-0"></div>
+
+    <!-- API Key Modal -->
+    <div id="apiKeyModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
+        <div class="glass rounded-3xl p-8 max-w-lg w-full mx-4 shadow-2xl animate-slide-up border-2 border-ocean-blue dark:border-ocean-light">
+            <div class="flex items-center justify-center mb-6">
+                <div class="w-16 h-16 bg-gradient-to-br from-ocean-blue to-ocean-light rounded-2xl flex items-center justify-center animate-glow">
+                    <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 18c-3.86-.95-7-5.08-7-9V8.3l7-3.11 7 3.11V11c0 3.92-3.14 8.05-7 9z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold text-center bg-gradient-to-r from-ocean-blue to-ocean-light bg-clip-text text-transparent mb-2">Welcome to Neuro AI</h2>
+            <p class="text-center text-gray-600 dark:text-gray-400 mb-6">Enter your Gemini API key to unlock advanced AI capabilities</p>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">API Key</label>
+                <input type="password" id="apiKeyInput" placeholder="Enter your Gemini API key..." class="w-full px-4 py-3 bg-white dark:bg-dark-card border-2 border-ocean-blue dark:border-ocean-light rounded-xl focus:outline-none focus:ring-4 focus:ring-ocean-blue focus:ring-opacity-30 transition-all" />
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Select Model</label>
+                <select id="modelSelect" class="w-full px-4 py-3 bg-white dark:bg-dark-card border-2 border-ocean-blue dark:border-ocean-light rounded-xl focus:outline-none focus:ring-4 focus:ring-ocean-blue focus:ring-opacity-30 transition-all">
+                    <option value="gemini-2.5-pro">Gemini 2.5 Pro - Advanced Reasoning</option>
+                    <option value="gemini-2.5-flash" selected>Gemini 2.5 Flash - Fast & Efficient</option>
+                    <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite - Ultra Fast</option>
+                </select>
+                <p id="modelDescription" class="text-xs text-gray-500 dark:text-gray-500 mt-2">Optimized for speed and efficiency with thinking capabilities</p>
+            </div>
+            <button onclick="saveApiKey()" class="w-full py-3 bg-gradient-to-r from-ocean-blue to-ocean-deep hover:from-ocean-deep hover:to-ocean-blue text-white font-semibold rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300">Start Chat</button>
+            <p class="text-xs text-center text-gray-500 dark:text-gray-500 mt-4">Get your free API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-ocean-blue hover:underline">Google AI Studio</a></p>
+        </div>
+    </div>
+
+    <!-- Sidebar Overlay -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-30 hidden" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <nav id="sidebar" class="fixed left-0 top-0 h-full w-80 glass z-40 transform -translate-x-full transition-transform duration-300 shadow-2xl">
+        <div class="p-6 border-b border-gray-200 dark:border-dark-border flex items-center justify-between">
+            <h3 class="text-xl font-bold bg-gradient-to-r from-ocean-blue to-ocean-light bg-clip-text text-transparent">Navigation</h3>
+            <button onclick="toggleSidebar()" class="p-2 hover:bg-gray-200 dark:hover:bg-dark-card rounded-lg transition-colors">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-4 space-y-6 overflow-y-auto h-[calc(100%-80px)]">
+            <div>
+                <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">Chat</h4>
+                <button onclick="newChat()" class="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-ocean-blue to-ocean-deep text-white rounded-xl hover:shadow-lg transition-all transform hover:scale-105"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span class="font-medium">New Chat</span></button>
+                <button onclick="clearHistory()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-200 dark:hover:bg-dark-card rounded-xl transition-colors mt-2"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg><span>Clear History</span></button>
+            </div>
+
+            <div>
+                <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">Settings</h4>
+                <button onclick="changeApiKey()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-200 dark:hover:bg-dark-card rounded-xl transition-colors"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg><span>Change API Key</span></button>
+                <button onclick="changeModel()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-200 dark:hover:bg-dark-card rounded-xl transition-colors mt-2"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg><span>Switch Model</span></button>
+            </div>
+
+            <div>
+                <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">Current Model</h4>
+                <div class="px-4 py-3 bg-ocean-blue bg-opacity-10 dark:bg-ocean-blue dark:bg-opacity-20 rounded-xl border border-ocean-blue dark:border-ocean-light">
+                    <p id="currentModel" class="text-sm font-medium text-ocean-blue dark:text-ocean-light">Gemini 2.5 Flash</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">Fast & Efficient</p>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="relative z-10">
+        <!-- Header -->
+        <header class="glass sticky top-0 z-20 border-b border-gray-200 dark:border-dark-border shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="p-2 hover:bg-gray-200 dark:hover:bg-dark-card rounded-xl transition-all transform hover:scale-110">
+                        <svg class="w-6 h-6 text-ocean-blue" fill="currentColor" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+                    </button>
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-ocean-blue to-ocean-light rounded-xl flex items-center justify-center animate-glow">
+                            <svg class="w-7 h-7 text-white animate-pulse-slow" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5zm0 18c-3.86-.95-7-5.08-7-9V8.3l7-3.11 7 3.11V11c0 3.92-3.14 8.05-7 9z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold bg-gradient-to-r from-ocean-blue via-ocean-light to-ocean-sky bg-clip-text text-transparent neon-blue">Neuro AI</h1>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Powered by Gemini 2.5</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <!-- Theme Toggle -->
+                    <button onclick="toggleTheme()" class="p-2 hover:bg-gray-200 dark:hover:bg-dark-card rounded-xl transition-all transform hover:scale-110">
+                        <svg id="themeIcon" class="w-6 h-6 text-ocean-blue" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                    </button>
+                    <!-- Status Badge -->
+                    <div class="flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900 dark:bg-opacity-30 border border-green-500 rounded-full">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                        <span id="statusText" class="text-sm font-medium text-green-700 dark:text-green-400">Ready</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Chat Container -->
+        <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div id="chatMessages" class="space-y-6 mb-32 min-h-[60vh]">
+                <!-- Empty State -->
+                <div class="text-center py-20 animate-float">
+                    <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-ocean-blue to-ocean-light rounded-3xl flex items-center justify-center animate-glow">
+                        <svg class="w-14 h-14 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                        </svg>
+                    </div>
+                    <h2 class="text-4xl font-bold bg-gradient-to-r from-ocean-blue to-ocean-light bg-clip-text text-transparent mb-3">
+                        Welcome to Neuro AI
+                    </h2>
+                    <p class="text-gray-600 dark:text-gray-400 text-lg mb-2">
+                        Your advanced AI assistant powered by Google Gemini 2.5
+                    </p>
+                    <p class="text-gray-500 dark:text-gray-500 text-sm">
+                        Ask me anything - I'm here to help with thinking capabilities!
+                    </p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Input Container with file attachment -->
+        <div class="fixed bottom-0 left-0 right-0 glass border-t border-gray-200 dark:border-dark-border z-20 shadow-2xl">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <form id="inputForm" onsubmit="event.preventDefault(); sendMessage();" class="flex flex-col gap-3">
+                    <textarea id="userInput" rows="1" placeholder="Ask Neuro AI anything..." class="w-full px-6 py-4 bg-white dark:bg-dark-card border-2 border-ocean-blue dark:border-ocean-light rounded-2xl focus:outline-none focus:ring-4 focus:ring-ocean-blue focus:ring-opacity-30 resize-none transition-all" onkeydown="handleKeyDown(event)"></textarea>
+                    <div class="input-controls">
+                        <label for="fileInput" id="fileInputLabel" title="Attach a file">Attach File</label>
+                        <input type="file" id="fileInput" onchange="handleFileSelect(event)" multiple />
+                        <div id="fileNameDisplay" aria-live="polite"></div>
+                        <button type="submit" id="sendBtn" class="ml-auto px-8 py-4 bg-gradient-to-r from-ocean-blue to-ocean-deep hover:from-ocean-deep hover:to-ocean-blue text-white font-semibold rounded-2xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                            </svg>
+                            <span>Send</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <div class="glass px-6 py-3 rounded-2xl border-2 border-ocean-blue shadow-2xl">
+            <p id="toastMessage" class="text-sm font-medium"></p>
+        </div>
+    </div>
+
+    <script>
+        let apiKey = null;
+        let selectedModel = "gemini-2.5-flash";
+        let conversationHistory = [];
+        let attachedFiles = [];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            createParticles();
+            initTheme();
+            updateModelDescription();
+
+            document.getElementById("modelSelect").addEventListener("change", () => {
+                updateModelDescription();
+                selectedModel = document.getElementById("modelSelect").value;
+                const modelNames = {
+                    "gemini-2.5-pro": "Gemini 2.5 Pro",
+                    "gemini-2.5-flash": "Gemini 2.5 Flash",
+                    "gemini-2.5-flash-lite": "Gemini 2.5 Flash-Lite"
+                };
+                document.getElementById("currentModel").textContent = modelNames[selectedModel] || "Gemini 2.5 Flash";
+            });
+        });
+
+        function createParticles() {
+            const container = document.getElementById("particles");
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement("div");
+                particle.className = "particle";
+                particle.style.width = Math.random() * 4 + 2 + "px";
+                particle.style.height = particle.style.width;
+                particle.style.left = Math.random() * 100 + "%";
+                particle.style.top = Math.random() * 100 + "%";
+                particle.style.background = `rgba(11, 110, 253, ${Math.random() * 0.5 + 0.2})`;
+                particle.style.animation = `particleFloat ${Math.random() * 20 + 10}s linear infinite`;
+                particle.style.animationDelay = Math.random() * 5 + "s";
+                container.appendChild(particle);
+            }
+        }
+
+        function initTheme() {
+            const theme = localStorage.getItem("theme") || "dark";
+            if (theme === "dark") {
+                document.documentElement.classList.add("dark");
+            }
+        }
+
+        function toggleTheme() {
+            document.documentElement.classList.toggle("dark");
+            const isDark = document.documentElement.classList.contains("dark");
+            localStorage.setItem("theme", isDark ? "dark" : "light");
+            showToast(isDark ? "Dark mode enabled" : "Light mode enabled");
+        }
+
+        function updateModelDescription() {
+            const model = document.getElementById("modelSelect").value;
+            const desc = document.getElementById("modelDescription");
+            const descriptions = {
+                "gemini-2.5-pro": "Advanced reasoning and thinking capabilities for complex problems",
+                "gemini-2.5-flash": "Optimized for speed and efficiency with thinking capabilities",
+                "gemini-2.5-flash-lite": "Ultra-fast responses with lightweight reasoning"
+            };
+            desc.textContent = descriptions[model];
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById("sidebar");
+            const overlay = document.getElementById("sidebarOverlay");
+            sidebar.classList.toggle("-translate-x-full");
+            overlay.classList.toggle("hidden");
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById("apiKeyInput").value.trim();
+            if (!key) {
+                showToast("Please enter a valid API key", true);
+                return;
+            }
+            apiKey = key;
+            selectedModel = document.getElementById("modelSelect").value;
+            document.getElementById("apiKeyModal").classList.add("hidden");
+            const modelNames = {
+                "gemini-2.5-pro": "Gemini 2.5 Pro",
+                "gemini-2.5-flash": "Gemini 2.5 Flash",
+                "gemini-2.5-flash-lite": "Gemini 2.5 Flash-Lite"
+            };
+            document.getElementById("currentModel").textContent = modelNames[selectedModel];
+            showToast("API Key saved successfully! Ready to chat.");
+        }
+
+        function changeApiKey() {
+            toggleSidebar();
+            document.getElementById("apiKeyModal").classList.remove("hidden");
+        }
+
+        function changeModel() {
+            toggleSidebar();
+            document.getElementById("apiKeyModal").classList.remove("hidden");
+        }
+
+        function newChat() {
+            conversationHistory = [];
+            document.getElementById("chatMessages").innerHTML = `
+                <div class="text-center py-20 animate-float">
+                    <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-ocean-blue to-ocean-light rounded-3xl flex items-center justify-center animate-glow">
+                        <svg class="w-14 h-14 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                        </svg>
+                    </div>
+                    <h2 class="text-4xl font-bold bg-gradient-to-r from-ocean-blue to-ocean-light bg-clip-text text-transparent mb-3">
+                        Welcome to Neuro AI
+                    </h2>
+                    <p class="text-gray-600 dark:text-gray-400 text-lg mb-2">
+                        Your advanced AI assistant powered by Google Gemini 2.5
+                    </p>
+                    <p class="text-gray-500 dark:text-gray-500 text-sm">
+                        Ask me anything - I'm here to help with thinking capabilities!
+                    </p>
+                </div>`;
+            toggleSidebar();
+            showToast("New chat started");
+        }
+
+        function clearHistory() {
+            if (confirm("Clear all chat history?")) {
+                newChat();
+            }
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function handleFileSelect(event) {
+            attachedFiles = Array.from(event.target.files);
+            updateFileNameDisplay();
+        }
+
+        function updateFileNameDisplay() {
+            const display = document.getElementById("fileNameDisplay");
+            if (attachedFiles.length === 0) {
+                display.textContent = "";
+                return;
+            }
+            display.textContent = attachedFiles.map(f => f.name).join(", ");
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById("userInput");
+            const message = input.value.trim();
+
+            if (!message && attachedFiles.length === 0) {
+                return;
+            }
+
+            if (!apiKey) {
+                document.getElementById("apiKeyModal").classList.remove("hidden");
+                return;
+            }
+
+            // Prepare message to include file info
+            const combinedMessage = await generateMessageWithFiles(message, attachedFiles);
+
+            // Clear inputs
+            input.value = "";
+            input.style.height = "auto";
+            document.getElementById("fileInput").value = "";
+            attachedFiles = [];
+            updateFileNameDisplay();
+
+            // Remove empty state animation if present
+            const emptyState = document.querySelector(".animate-float");
+            if (emptyState) {
+                emptyState.remove();
+            }
+
+            addMessage(combinedMessage, "user");
+
+            updateStatus("Thinking...", false);
+
+            input.disabled = true;
+            document.getElementById("sendBtn").disabled = true;
+
+            const loadingId = addLoadingMessage();
+
+            try {
+                const response = await callGeminiAPI(combinedMessage);
+                removeLoadingMessage(loadingId);
+                addMessage(response, "ai", true);
+                updateStatus("Ready", true);
+            } catch (error) {
+                console.error("Error:", error);
+                removeLoadingMessage(loadingId);
+                let errorMessage = "Sorry, I encountered an error. ";
+                if (error.message.includes("403") || error.message.includes("401")) {
+                    errorMessage += "Please check your API key.";
+                } else if (error.message.includes("429")) {
+                    errorMessage += "Rate limit exceeded.";
+                } else {
+                    errorMessage += error.message || "Please try again.";
+                }
+                addMessage(errorMessage, "ai");
+                updateStatus("Error", false);
+                showToast(errorMessage, true);
+            }
+
+            input.disabled = false;
+            document.getElementById("sendBtn").disabled = false;
+            input.focus();
+        }
+
+        async function generateMessageWithFiles(message, files) {
+            if (files.length === 0) return message;
+
+            // Just add file info to message text
+            let filesDesc = files.map(f => `[File attached: ${f.name} (${formatBytes(f.size)})]`).join("\n");
+            return message ? message + "\n\n" + filesDesc : filesDesc;
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return "0 Bytes";
+            const k = 1024;
+            const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+        }
+
+        async function callGeminiAPI(message) {
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`;
+
+            const requestBody = {
+                contents: [{ parts: [{ text: message }] }],
+                generationConfig: {
+                    temperature: 0.9,
+                    topK: 40,
+                    topP: 0.95,
+                    maxOutputTokens: 2048
+                }
+            };
+
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error?.message || `API Error: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+                throw new Error("Invalid response from API");
+            }
+
+            return data.candidates[0].content.parts[0].text;
+        }
+
+        function addMessage(text, type, withActions = false) {
+            const container = document.getElementById("chatMessages");
+            const messageDiv = document.createElement("div");
+            messageDiv.className = `flex gap-4 message-enter ${type === "user" ? "flex-row-reverse" : ""}`;
+
+            const avatar = document.createElement("div");
+            avatar.className = `w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                type === "user" ? "bg-gradient-to-br from-purple-500 to-purple-700" : "bg-gradient-to-br from-ocean-blue to-ocean-light animate-glow"
+            }`;
+            avatar.textContent = type === "user" ? "👤" : "🧠";
+
+            const wrapper = document.createElement("div");
+            wrapper.className = "flex-1 max-w-3xl";
+
+            const content = document.createElement("div");
+            content.className = `px-6 py-4 rounded-2xl shadow-lg ${
+                type === "user" ? "bg-gradient-to-br from-purple-500 to-purple-600 text-white ml-auto" : "bg-white dark:bg-dark-card border-2 border-ocean-blue dark:border-ocean-light"
+            }`;
+            content.style.whiteSpace = "pre-wrap";
+            content.textContent = text;
+
+            wrapper.appendChild(content);
+
+            if (withActions && type === "ai") {
+                const actions = document.createElement("div");
+                actions.className = "flex gap-2 mt-3 flex-wrap";
+
+                const buttons = [
+                    {
+                        icon: "M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z", label: "Copy", action: () => copyMessage(text)
+                    },
+                    {
+                        icon: "M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z", label: "Like", action: (btn) => toggleLike(btn)
+                    },
+                    {
+                        icon: "M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z", label: "Dislike", action: (btn) => toggleDislike(btn)
+                    },
+                    {
+                        icon: "M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z", label: "Share", action: () => shareMessage(text)
+                    }
+                ];
+                buttons.forEach(btn => {
+                    const button = document.createElement("button");
+                    button.className = "flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-dark-card hover:bg-ocean-blue hover:text-white dark:hover:bg-ocean-blue border border-gray-300 dark:border-dark-border rounded-lg transition-all text-sm";
+                    button.innerHTML = `<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="${btn.icon}"/></svg><span>${btn.label}</span>`;
+                    button.onclick = () => btn.action(button);
+                    actions.appendChild(button);
+                });
+                wrapper.appendChild(actions);
+            }
+
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(wrapper);
+            container.appendChild(messageDiv);
+            messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+
+        function copyMessage(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("Copied to clipboard!");
+            });
+        }
+
+        function toggleLike(button) {
+            button.classList.toggle("bg-green-500");
+            button.classList.toggle("text-white");
+            showToast("Thanks for your feedback!");
+        }
+
+        function toggleDislike(button) {
+            button.classList.toggle("bg-red-500");
+            button.classList.toggle("text-white");
+            showToast("Thanks for your feedback!");
+        }
+
+        function shareMessage(text) {
+            if (navigator.share) {
+                navigator.share({ title: "Neuro AI Response", text });
+            } else {
+                copyMessage(text);
+                showToast("Copied for sharing!");
+            }
+        }
+
+        function addLoadingMessage() {
+            const container = document.getElementById("chatMessages");
+            const loadingDiv = document.createElement("div");
+            loadingDiv.id = "loading-message";
+            loadingDiv.className = "flex gap-4 message-enter";
+            loadingDiv.innerHTML = `
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-ocean-blue to-ocean-light animate-glow">
+                    🧠
+                </div>
+                <div class="flex-1 max-w-3xl">
+                    <div class="px-6 py-4 rounded-2xl shadow-lg bg-white dark:bg-dark-card border-2 border-ocean-blue dark:border-ocean-light">
+                        <div class="flex gap-2">
+                            <div class="w-3 h-3 bg-ocean-blue rounded-full thinking-dot"></div>
+                            <div class="w-3 h-3 bg-ocean-blue rounded-full thinking-dot"></div>
+                            <div class="w-3 h-3 bg-ocean-blue rounded-full thinking-dot"></div>
+                        </div>
+                    </div>
+                </div>`;
+            container.appendChild(loadingDiv);
+            loadingDiv.scrollIntoView({ behavior: "smooth", block: "end" });
+            return "loading-message";
+        }
+
+        function removeLoadingMessage(id) {
+            const loading = document.getElementById(id);
+            if (loading) loading.remove();
+        }
+
+        function updateStatus(text, isReady) {
+            const statusText = document.getElementById("statusText");
+            const statusBadge = statusText.parentElement;
+            statusText.textContent = text;
+            if (isReady) {
+                statusBadge.className = "flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900 dark:bg-opacity-30 border border-green-500 rounded-full";
+                statusText.className = "text-sm font-medium text-green-700 dark:text-green-400";
+            } else {
+                statusBadge.className = "flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900 dark:bg-opacity-30 border border-blue-500 rounded-full";
+                statusText.className = "text-sm font-medium text-blue-700 dark:text-blue-400";
+            }
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById("toast");
+            const toastMessage = document.getElementById("toastMessage");
+            toastMessage.textContent = message;
+            toast.style.transform = "translateX(-50%) translateY(0)";
+            toast.style.opacity = "1";
+
+            if (isError) {
+                toast.querySelector(".glass").classList.add("border-red-500");
+            } else {
+                toast.querySelector(".glass").classList.remove("border-red-500");
+            }
+
+            setTimeout(() => {
+                toast.style.transform = "translateX(-50%) translateY(20px)";
+                toast.style.opacity = "0";
+            }, 3000);
+        }
+    </script>
+
+</body>
+</html>
